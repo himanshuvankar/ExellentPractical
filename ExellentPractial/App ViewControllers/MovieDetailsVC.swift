@@ -63,6 +63,7 @@ extension MovieDetailsVC{
                     var gen = ""
                     self.genres = (self.moviesDetails?.genres)!
                     self.productionCompanies = (self.moviesDetails?.production_companies)!
+                    self.language = (self.moviesDetails?.spoken_languages)!
                     for i in self.genres{
                         if gen == ""{
                             gen = i.name!
@@ -84,8 +85,9 @@ extension MovieDetailsVC{
                         }
                     }
                     self.DetailsData.append(Details_Data.init(ttl: "Production Budget", vle: gen))
-                    self.DetailsData.append(Details_Data.init(ttl: "release_date", vle: "$\(self.moviesDetails?.budget ?? 0)"))
+                    self.DetailsData.append(Details_Data.init(ttl: "Release Date", vle: "$\(self.moviesDetails?.budget ?? 0)"))
                     self.DetailsData.append(Details_Data.init(ttl: "Revenue", vle: "$\(self.moviesDetails?.revenue ?? 0)"))
+                    
                     gen = ""
                     for i in self.language{
                         if gen == ""{
@@ -112,7 +114,7 @@ extension MovieDetailsVC{
 //MARK: - TableView Delegates
 extension MovieDetailsVC : UITableViewDelegate,UITableViewDataSource{
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 10
+        return self.DetailsData.count + 1
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
@@ -122,8 +124,8 @@ extension MovieDetailsVC : UITableViewDelegate,UITableViewDataSource{
         if indexPath.section == 0{
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "MoviesDetailsCell", for: indexPath) as? MoviesDetailsCell else {return UITableViewCell()}
             let row = self.moviesDetails
-            cell.imgLargePoster.sd_setImage(with: URL(string: AppURL.imageBaseURL + (row?.belongs_to_collection?.poster_path ?? "")), placeholderImage: #imageLiteral(resourceName: GlobalConstants.PlaceHolderImageName))
-            cell.imgPoster.sd_setImage(with: URL(string: AppURL.imageBaseURL + (row?.belongs_to_collection?.poster_path ?? "")), placeholderImage: #imageLiteral(resourceName: GlobalConstants.PlaceHolderImageName))
+            cell.imgLargePoster.sd_setImage(with: URL(string: AppURL.imageBaseURL + (row?.backdrop_path ?? "")), placeholderImage: #imageLiteral(resourceName: GlobalConstants.PlaceHolderImageName))
+            cell.imgPoster.sd_setImage(with: URL(string: AppURL.imageBaseURL + (row?.poster_path ?? "")), placeholderImage: #imageLiteral(resourceName: GlobalConstants.PlaceHolderImageName))
             cell.lblTitle.text = row?.title ?? ""
             cell.lblDescripiton.text = row?.tagline ?? ""
             cell.TransparentBGView.layer.backgroundColor = UIColor.clear.withAlphaComponent(0.25).cgColor
@@ -131,13 +133,17 @@ extension MovieDetailsVC : UITableViewDelegate,UITableViewDataSource{
             cell.selectionStyle = .none
             return cell
         }
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MoviePosterCell", for: indexPath) as? MoviePosterCell else {return UITableViewCell()}
-        let row = self.moviesDetails
-//        cell.lblTitle.text =
-        
-        cell.backgroundColor = .clear
-        cell.selectionStyle = .none
-        return cell
+        else{
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "MoviePosterCell", for: indexPath) as? MoviePosterCell else {return UITableViewCell()}
+            print("indexPath.section",indexPath.section)
+            let row = self.DetailsData[indexPath.section - 1]
+            cell.lblTitle.text = row.title ?? ""
+            cell.lblDescription.text = row.value ?? ""
+            
+            cell.backgroundColor = .clear
+            cell.selectionStyle = .none
+            return cell
+        }
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0{

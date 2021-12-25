@@ -1,0 +1,6 @@
+framework module Pods_ExellentPractial {
+  umbrella header "Pods-ExellentPractial-umbrella.h"
+
+  export *
+  module * { export * }
+}
